@@ -1,0 +1,44 @@
+# Perps docs say only BTC and ETH are live — 60 perp markets are actually live
+
+Severity: normal
+Area: docs
+
+## Steps to reproduce
+
+1. Open the SDK perps docs: https://prd.smk.somnia.host/docs/typescript/perps — it states: *"Perps are live on testnet: `BTC/USDSO:USDSO` and `ETH/USDSO:USDSO`"*.
+2. On the Somnia Tokyo testnet (Hideki, chain 50383), call `client.listPerpMarkets({ limit: 100 })` from `@somnia-chain/markets-sdk` 0.32.1 (indexer `https://hideki-dev.smk.somnia.host/v1/graphql`).
+3. Count the returned perp markets and compare with the docs.
+
+## Expected
+
+The docs should list (or at least not contradict) the live perp markets. A developer reading the perps page should learn which markets exist before writing a bot.
+
+## Actual
+
+**60 perp markets** are live, not 2. Beyond BTC (1,759,033 trades) and ETH (907,704 trades), the live set includes SOL (707,058), HYPE (669,580), NEAR (542,236), XRP, DOGE, ADA, BNB, LINK, AVAX, SUI, TAO, WLD, XLM, ZEC, PUMP, 1000PEPE, VVV, LIT, ZRO, plus commodities (WTI, XAG, XAU) and equities (GOOGL, TSLA, HYNX, MSTR, MRVL, LITE, INTC, HOOD, COIN, AMD, ADLT) — all sharing MarginBank `0x478769E1177C0773c43A593DCCc4Ad15F15F1394`, with `initialMarginBps` 250 (20x), 500 (10x), 1000 (5x), or 2000 (2.5x). The set also includes test/load markets (T-series pools and LOADTEST), which the docs do not mention either.
+
+The same "only BTC + ETH" wording appears in the SDK docs index page (https://prd.smk.somnia.host/docs/typescript): *"Perps — live on testnet: cross-margin via the MarginBank, funding, positions…"* — the perps page itself is the explicit two-market claim.
+
+## Evidence
+
+- Docs (https://prd.smk.somnia.host/docs/typescript/perps): *"Perps are live on testnet: `BTC/USDSO:USDSO` and `ETH/USDSO:USDSO`, backed by PerpPool CLOBs riding the same shared OrderBook core as spot and binary."*
+- `listPerpMarkets({ limit: 100 })` response (2026-11-15 ~09:47 WIB, SDK 0.32.1): 60 rows. Symbols observed: BTC, ETH, SOL, XRP, DOGE, ADA, BNB, LINK, AVAX, SUI, TAO, WLD, NEAR, XLM, ZEC, PUMP, 1000PEPE, VVV, LIT, ZRO, WTI, XAG, XAU, GOOGL, TSLA, HYNX, MSTR, MRVL, LITE, INTC, HOOD, COIN, AMD, ADLT, plus T581A66/T481A66/T381A66/T281A66/T181A66/T5C1033…/T580E00…/T5AADFF… and LOADTEST (5 pools, same symbol, different pool addresses).
+- The dreamDEX testnet app's own docs (https://app.testnet.dreamdex.io/docs/trading/perps-testnet/margin-and-liquidations) already describe the broader market set, so the SDK docs page is the stale one.
+
+## Environment
+
+- SDK version: `@somnia-chain/markets-sdk` 0.32.1 (the version the dreamDEX app runs; latest on npm 0.33.0)
+- Network: Somnia Tokyo testnet (Hideki, chain 50383)
+- Wallet address: 0xa505479a6410a848d41fc0f495e431e558233ff3
+- Date observed: 2026-11-15 ~09:47 WIB
+
+## Suggested fix
+
+Update the perps docs page to describe the live market set (or point at `listPerpMarkets` as the source of truth) instead of hard-coding "BTC and ETH". If the extra markets are intentional-but-unlisted, say so and explain their status (e.g. which are load-test pools).
+
+## Duplicate-check note
+
+- `somnia-chain/somnia-markets` issue tracker could not be searched — the repo returns 404 via the GitHub API (private/renamed).
+- `somnia-chain/dreamdex-bot-kit` issues searched for `listPerpMarkets`, `perp markets`: 0 hits.
+- Web search found no matching public report.
+- Residual limit: other bounty submissions are not public, so a same-day duplicate by another hunter cannot be fully excluded. This is the most visible/obvious of the three candidates and therefore the most duplicate-prone.
