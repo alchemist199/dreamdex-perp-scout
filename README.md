@@ -1,28 +1,23 @@
 # dreamdex-perp-scout
 
-Read-only perp-market scout for [dreamDEX](https://app.testnet.dreamdex.io) on the
-Somnia Hideki testnet, built with `@somnia-chain/markets-sdk` (v0.32.1 — the version
-the dreamDEX app runs).
+A small read-only script that lists every perp market on dreamDEX testnet (Somnia Hideki) and prints funding, index price, open interest and trade counts. It also spot-checks one market's live on-chain state.
 
-It lists every perp market with its pool address, initial margin, funding rate,
-index price, open interest and trade count, then spot-checks the first market's
-live on-chain state. No signer, no transactions, no private keys — read-only.
+I wrote it while poking around the Markets SDK for the dreamDEX Perps Builder Bounty. It uses `@somnia-chain/markets-sdk` 0.32.1, the same version the dreamDEX app runs. No wallet, no signing, no transactions. It only reads.
 
-Built as proof of building for the
-[dreamDEX Perps Builder Bounty](https://dorahacks.io/hackathon/dreamdex-perps-bounty/detail)
-on DoraHacks, and as scaffolding for Feedback-track research into the Markets SDK,
-the indexer API and the perp pools on Somnia Tokyo testnet.
-
-## Run
+## Run it
 
 ```bash
 npm install
 npm start
 ```
 
-## Stack
+## What's in here
 
-- `@somnia-chain/markets-sdk` 0.32.1
-- `viem`
-- Indexer: `https://hideki-dev.smk.somnia.host/v1/graphql`
-- Chain: Somnia Hideki testnet
+- `index.mjs` — the scout itself
+- `feedback/` — three issues I found while testing the SDK, the indexer and the docs: one about null funding fields on live pools, one about the claimed 10 ms block time, and one about the docs only listing BTC and ETH
+
+## Setup
+
+- SDK: `@somnia-chain/markets-sdk` 0.32.1
+- Chain: Somnia Hideki testnet (50383)
+- Indexer: https://hideki-dev.smk.somnia.host/v1/graphql
